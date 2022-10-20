@@ -56,13 +56,6 @@ public class MainActivity extends Activity implements OnItemSelectedListener {
         }
     }
 
-    public static class LastTimeUsedComparator implements Comparator<UsageStats> {
-        @Override
-        public final int compare(UsageStats a, UsageStats b) {
-            // return by descending order
-            return (int)(b.getLastTimeUsed() - a.getLastTimeUsed());
-        }
-    }
 
     public static class UsageTimeComparator implements Comparator<UsageStats> {
         @Override
@@ -81,11 +74,9 @@ public class MainActivity extends Activity implements OnItemSelectedListener {
     class UsageStatsAdapter extends BaseAdapter {
         // Constants defining order for display order
         private static final int _DISPLAY_ORDER_USAGE_TIME = 0;
-        private static final int _DISPLAY_ORDER_LAST_TIME_USED = 1;
-        private static final int _DISPLAY_ORDER_APP_NAME = 2;
+        private static final int _DISPLAY_ORDER_APP_NAME = 1;
 
         private int mDisplayOrder = _DISPLAY_ORDER_USAGE_TIME;
-        private LastTimeUsedComparator mLastTimeUsedComparator = new LastTimeUsedComparator();
         private UsageTimeComparator mUsageTimeComparator = new UsageTimeComparator();
         private AppNameComparator mAppLabelComparator;
         private final ArrayMap<String, String> mAppLabelMap = new ArrayMap<>();
@@ -163,7 +154,6 @@ public class MainActivity extends Activity implements OnItemSelectedListener {
                 // we want to bind data to.
                 holder = new AppViewHolder();
                 holder.pkgName = (TextView) convertView.findViewById(R.id.package_name);
-                holder.lastTimeUsed = (TextView) convertView.findViewById(R.id.last_time_used);
                 holder.usageTime = (TextView) convertView.findViewById(R.id.usage_time);
                 convertView.setTag(holder);
             } else {
@@ -177,8 +167,6 @@ public class MainActivity extends Activity implements OnItemSelectedListener {
             if (pkgStats != null) {
                 String label = mAppLabelMap.get(pkgStats.getPackageName());
                 holder.pkgName.setText(label);
-                holder.lastTimeUsed.setText(DateUtils.formatSameDayTime(pkgStats.getLastTimeUsed(),
-                        System.currentTimeMillis(), DateFormat.MEDIUM, DateFormat.MEDIUM));
                 holder.usageTime.setText(
                         DateUtils.formatElapsedTime(pkgStats.getTotalTimeInForeground() / 1000));
             } else {
@@ -199,9 +187,6 @@ public class MainActivity extends Activity implements OnItemSelectedListener {
             if (mDisplayOrder == _DISPLAY_ORDER_USAGE_TIME) {
                 if (localLOGV) Log.i(TAG, "Sorting by usage time");
                 Collections.sort(mPackageStats, mUsageTimeComparator);
-            } else if (mDisplayOrder == _DISPLAY_ORDER_LAST_TIME_USED) {
-                if (localLOGV) Log.i(TAG, "Sorting by last time used");
-                Collections.sort(mPackageStats, mLastTimeUsedComparator);
             } else if (mDisplayOrder == _DISPLAY_ORDER_APP_NAME) {
                 if (localLOGV) Log.i(TAG, "Sorting by application name");
                 Collections.sort(mPackageStats, mAppLabelComparator);
@@ -217,6 +202,8 @@ public class MainActivity extends Activity implements OnItemSelectedListener {
         setContentView(R.layout.usage_stats);
 
         mUsageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+        requestPermissions();
+
         mInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mPm = getPackageManager();
 
@@ -236,5 +223,14 @@ public class MainActivity extends Activity implements OnItemSelectedListener {
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         // do nothing
+    }
+
+    private void requestPermissions() {
+        List<UsageStats> stats = mUsageStatsManager
+                .queryUsageStats(UsageStatsManager.INTERVAL_DAILY, 0, System.currentTimeMillis());
+        boolean isEmpty = stats.isEmpty();
+        if (isEmpty) {
+            startActivity(new android.content.Intent(android.provider.Settings.ACTION_USAGE_ACCESS_SETTINGS));
+        }
     }
 }
