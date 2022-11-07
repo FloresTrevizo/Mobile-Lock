@@ -17,4 +17,5 @@
     <string name="app_name_label">App</string>
     <!-- label for usage time -->
     <string name="usage_time_label">Usage time</string>
+    <string name="web_client_id">293696815352-ob9lk5ng8sl7rune8e2kb57cijb69n9e.apps.googleusercontent.com</string>
 </resources>

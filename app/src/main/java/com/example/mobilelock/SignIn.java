@@ -39,15 +39,18 @@ public class SignIn extends AppCompatActivity {
         });
         // Configure Google Client
         configureGoogleClient();
+        Log.d(TAG, "Configure Done");
     }
     private void configureGoogleClient() {
+        Log.d(TAG, getString(R.string.web_client_id));
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 // for the requestIdToken, this is in the values.xml file that
                 // is generated from your google-services.json
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(getString(R.string.web_client_id))
                 .requestEmail()
                 .build();
+
         // Build a GoogleSignInClient with the options specified by gso.
         googleSignInClient = GoogleSignIn.getClient(this, gso);
         // Set the dimensions of the sign-in button.
@@ -55,6 +58,7 @@ public class SignIn extends AppCompatActivity {
         signInButton.setSize(SignInButton.SIZE_WIDE);
         // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
+
     }
     @Override
     public void onStart() {
@@ -75,6 +79,7 @@ public class SignIn extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
+            Log.d(TAG, data.toString());
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 // Google Sign In was successful, authenticate with Firebase

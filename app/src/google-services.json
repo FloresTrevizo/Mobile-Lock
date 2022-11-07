@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "293696815352",
+    "project_id": "mobilelock",
+    "storage_bucket": "mobilelock.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:293696815352:android:64712341f936f7fce47b0d",
+        "android_client_info": {
+          "package_name": "com.example.mobilelock"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "293696815352-ug6tef8klotl7lcag9upkm7mgdmmmtmu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mobilelock",
+            "certificate_hash": "15afdd9828b29540422c288ba16980a16744d0f8"
+          }
+        },
+        {
+          "client_id": "293696815352-ob9lk5ng8sl7rune8e2kb57cijb69n9e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIbJnhra0Fe4Wx9g4-j8uHnQBc_Jx1QO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "293696815352-ob9lk5ng8sl7rune8e2kb57cijb69n9e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
