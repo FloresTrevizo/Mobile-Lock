@@ -18,4 +18,14 @@
     <!-- label for usage time -->
     <string name="usage_time_label">Usage time</string>
     <string name="web_client_id">293696815352-ob9lk5ng8sl7rune8e2kb57cijb69n9e.apps.googleusercontent.com</string>
-</resources>
+    <string name="button">Button</string>
+    <string name="click_to_activate">Click to Activate</string>
+    <string name="home">Home</string>
+
+    <string-array name="languages">
+        <item>Home</item>
+        <item>Application Screen</item>
+        <item>Weekly Outlook</item>
+        <item>Settings</item>
+    </string-array>
+    </resources>
