@@ -32,14 +32,14 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".googleCalendarAccess"
+            android:name=".SignIn"
             android:exported="true">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".SignIn"
+            android:name=".googleCalendarAccess"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.MobileLock.NoActionBar">
