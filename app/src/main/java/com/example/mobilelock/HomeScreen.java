@@ -23,7 +23,8 @@ import com.google.api.services.calendar.CalendarScopes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 public class HomeScreen<adapter> extends AppCompatActivity {
     private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
@@ -36,7 +37,6 @@ public class HomeScreen<adapter> extends AppCompatActivity {
 
     private static NotificationCompat.Builder builder;
     private static NotificationManagerCompat notificationManager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class HomeScreen<adapter> extends AppCompatActivity {
 
                     moveTaskToBack(true);
 
-                    for(Notification ping: notifs) {
+                    for (Notification ping : notifs) {
                         sleep(2300);
                         notificationManager.notify(notificationId, ping);
                         notificationId++;
@@ -82,12 +82,32 @@ public class HomeScreen<adapter> extends AppCompatActivity {
                     Log.d(TAG + " Exception", e.getMessage());
                 }
             }
+
         });
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
         StrictMode.setThreadPolicy(policy);
 
+        //SPINNER NAVIGATION CODE
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View view, int position, long id) {
+                System.out.println(position);
+                switch (position) {
+                    case 2:
+                        startActivity(new Intent(HomeScreen.this, WeeklyOutlook.class));
+                        break;
+                    case 3:
+                        startActivity(new Intent(HomeScreen.this, MainActivity.class));
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
     }
 
     private Notification buildNotification(String title, String text) {
