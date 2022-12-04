@@ -5,6 +5,8 @@ import static android.os.SystemClock.sleep;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -49,40 +51,24 @@ public class HomeScreen<adapter> extends AppCompatActivity {
                 R.array.languages, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //call background service on
-                try {
-                    //calendarCall(view);
-                    // Create an explicit intent for an Activity in your app
-                    notificationManager = NotificationManagerCompat.from(getApplicationContext());
-                    ArrayList<Notification> notifs = new ArrayList<>();
 
-                    notifs.add(buildNotification("Busy Day Tomorrow.", "You have a busy day tomorrow. " +
-                            "To promote productivity," +
-                            " click here to block Instagram"));
-                    notifs.add(buildNotification("Warning:", "Your phone usage was larger than normal" +
-                            " yesterday. Click here to see specifics."));
-                    notifs.add(buildNotification("Take a Break.", "Your calendar shows you currently busy. " +
-                            "Focus on that, not your phone."));
+                Intent intent = new Intent(HomeScreen.this, ReminderBroadcast.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(HomeScreen.this, 0, intent, 0);
 
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-                    moveTaskToBack(true);
+                long timeAtButtonClick = System.currentTimeMillis();
 
-                    for (Notification ping : notifs) {
-                        sleep(2300);
-                        notificationManager.notify(notificationId, ping);
-                        notificationId++;
+                //change this variable to whatever delay you want
+                long delaySecondsInMillis = 500 * 10;
+
+                alarmManager.set(AlarmManager.RTC_WAKEUP,
+                        timeAtButtonClick + delaySecondsInMillis, pendingIntent);
                     }
-
-                    Log.d(TAG, "Pressed");
-
-                } catch (Exception e) {
-                    Log.d(TAG + " Exception", e.getMessage());
-                }
-            }
-
         });
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -108,22 +94,6 @@ public class HomeScreen<adapter> extends AppCompatActivity {
 
             }
         });
-    }
-
-    private Notification buildNotification(String title, String text) {
-        Intent intent = new Intent(getApplicationContext(), HomeScreen.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),
-                0, intent, PendingIntent.FLAG_IMMUTABLE);
-
-        builder = new NotificationCompat.Builder(getApplicationContext(), "Notifications")
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentTitle(title)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-        return builder.build();
     }
 
     private void createNotificationChannel() {
