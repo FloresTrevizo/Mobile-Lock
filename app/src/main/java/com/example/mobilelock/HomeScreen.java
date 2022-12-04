@@ -1,13 +1,10 @@
 package com.example.mobilelock;
 
-import static android.os.SystemClock.sleep;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -23,12 +20,13 @@ import android.text.format.DateUtils;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Spinner;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
@@ -58,9 +56,10 @@ public class HomeScreen<adapter> extends AppCompatActivity {
     private LayoutInflater mInflater;
     private HomeScreen.UsageStatsAdapter mAdapter;
     private PackageManager mPm;
-
     private static NotificationCompat.Builder builder;
     private static NotificationManagerCompat notificationManager;
+
+    private boolean userSelect = false;
 
 
     @Override
@@ -69,7 +68,7 @@ public class HomeScreen<adapter> extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
         createNotificationChannel();
         Button button = findViewById(R.id.button);
-        Spinner spinner=findViewById(R.id.spinner);
+        Spinner spinner=findViewById(R.id.spinner2);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.languages, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -108,17 +107,34 @@ public class HomeScreen<adapter> extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
         //SPINNER NAVIGATION CODE
+        spinner.setSelection(Adapter.NO_SELECTION,true);
+        spinner.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                userSelect = true;
+                return false;
+            }
+        });
         spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> arg0, View view, int position, long id) {
-                System.out.println(position);
-                switch (position) {
-                    case 2:
-                        startActivity(new Intent(HomeScreen.this, WeeklyOutlook.class));
-                        break;
-                    case 3:
-                        startActivity(new Intent(HomeScreen.this, HomeScreen.class));
-                        break;
+                if (userSelect) {
+                    switch (position) {
+                        case 0:
+                            System.out.println("SUCCESS SUCCESS SUCCESS");
+                            startActivity(new Intent(HomeScreen.this, HomeScreen.class));
+                            break;
+                        case 1:
+                            startActivity(new Intent(HomeScreen.this, HomeScreen.class));
+                            break;
+                        case 2:
+                            startActivity(new Intent(HomeScreen.this, WeeklyOutlook.class));
+                            break;
+                        case 3:
+                            startActivity(new Intent(HomeScreen.this, MainActivity.class));
+                            break;
+                    }
+                    userSelect = false;
                 }
             }
 

@@ -27,7 +27,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Spinner
-        android:id="@+id/spinner"
+        android:id="@+id/spinner2"
         android:layout_width="70dp"
         android:layout_height="60dp"
         android:contentDescription="@string/action_settings"
