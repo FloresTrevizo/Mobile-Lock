@@ -25,9 +25,6 @@
         android:usesCleartextTraffic="true" >
 
         <activity
-            android:name=".googleCalendarAccess"
-            android:exported="true"/>
-        <activity
             android:name=".WeeklyOutlook"
             android:exported="false">
             <meta-data
@@ -46,32 +43,47 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.MobileLock.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
-        <activity
-            android:name=".SignIn"
-            android:exported="true">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
 
 
-        </activity>
-        <activity
-            android:name=".HomeScreen"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.MobileLock.NoActionBar">
         </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true" />
         <receiver android:name=".ReminderBroadcast"/>
+
+        <activity
+            android:name=".googleCalendarAccess"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.example.mobilelock.HANDLE_AUTHORIZATION_RESPONSE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="net.openid.appauth.RedirectUriReceiverActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="com.example.mobilelock"
+                    android:path="/oauth2redirect"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="com.example.mobilelock"
+                    android:path="/logout"/>
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

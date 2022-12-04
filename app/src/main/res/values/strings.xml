@@ -37,4 +37,33 @@
     <string name="thursday">Thursday</string>
     <string name="friday">Friday</string>
     <string name="saturday">Saturday</string>
+
+    <!--OAuth Constants-->
+    <string name="SHARED_PREFERENCES_NAME">AUTH_STATE_PREFERENCE</string>
+    <string name="AUTH_STATE">AUTH_STATE</string>
+    <string name="SCOPE_PROFILE">profile</string>
+    <string name="SCOPE_EMAIL">email</string>
+    <string name="SCOPE_OPENID">openid</string>
+    <string name="SCOPE_DRIVE">https://www.googleapis.com/auth/drive</string>
+    <string name="SCOPE_CALENDAR">https://www.googleapis.com/auth/calendar</string>
+
+
+
+    <string name="DATA_PICTURE">picture</string>
+    <string name="DATA_FIRST_NAME">given_name</string>
+    <string name="DATA_LAST_NAME">family_name</string>
+    <string name="DATA_EMAIL">email</string>
+
+    <string name="CLIENT_ID">293696815352-vrkmgdco2q5de9h39hv7ndf4780uk4m1.apps.googleusercontent.com</string>
+    <string name="CODE_VERIFIER_CHALLENGE_METHOD">S256</string>
+    <string name="MESSAGE_DIGEST_ALGORITHM">SHA-256</string>
+
+    <string name="URL_AUTHORIZATION">https://accounts.google.com/o/oauth2/auth</string>
+    <string name="URL_TOKEN_EXCHANGE">https://oauth2.googleapis.com/token</string>
+    <string name="URL_AUTH_REDIRECT">com.example.mobilelock:/oauth2redirect</string>
+    <string name="URL_API_CALL">https://www.googleapis.com/drive/v2/files</string>
+    <string name="URL_LOGOUT">https://accounts.google.com/o/oauth2/revoke?token=</string>
+
+    <string name="URL_LOGOUT_REDIRECT">com.example.mobilelock:/logout</string>
+
 </resources>
