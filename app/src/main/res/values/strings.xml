@@ -26,7 +26,7 @@
         <item>Home</item>
         <item>Application Screen</item>
         <item>Weekly Outlook</item>
-        <item>Settings</item>
+        <item>Screen Time</item>
     </string-array>
     <string name="title_activity_weekly_outlook">weekly_outlook</string>
     <string name="weekly_outlook">Weekly Outlook</string>
