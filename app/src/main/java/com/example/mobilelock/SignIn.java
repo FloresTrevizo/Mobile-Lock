@@ -123,7 +123,7 @@ public class SignIn extends AppCompatActivity {
     }
     private void launchMainActivity(FirebaseUser user) {
         if (user != null) {
-            startActivity(new Intent(SignIn.this, HomeScreen.class));
+            startActivity(new Intent(SignIn.this, GoogleCalendarAccess.class));
             finish();
         }
     }
