@@ -69,7 +69,7 @@ public class ApplicationControl extends AppCompatActivity {
                 return;
             }
         });
-
+        //THIS IS THE CODE FOR THE SWITCHES (FOR PABLO)!!!!!!!!!!!!!!!!
         Switch switch1 = findViewById(R.id.switch1);
         Switch switch2 = findViewById(R.id.switch3);
         Switch switch3 = findViewById(R.id.switch4);
