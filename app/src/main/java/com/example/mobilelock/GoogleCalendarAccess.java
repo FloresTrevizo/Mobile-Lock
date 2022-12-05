@@ -8,6 +8,8 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -133,20 +135,26 @@ public class GoogleCalendarAccess extends AppCompatActivity {
                                 Log.d("Google Calendar", "" + mAuthStateManager.getCurrent().isAuthorized());
 
                                 //token exchange succeeded
+                                HandlerThread handlerThread = new HandlerThread("background-thread");
+                                handlerThread.start();
 
-                                beginCalendarCalls();
+                                Handler handler = new Handler(handlerThread.getLooper());
+                                int secondCount = 5;
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        beginCalendarCalls();
+
+                                        //currentlyBusyNotif();
+
+                                        handler.postDelayed(this, secondCount * 1000);
+                                    }
+                                }, secondCount * 1000);
                             }
                         }
                     });
             }
         }
-        else if (resultCode == RESULT_CANCELED) {
-
-        }
-
-        beginCalendarCalls();
-
-
 
         startActivity(new Intent(GoogleCalendarAccess.this, HomeScreen.class));
 
@@ -154,7 +162,7 @@ public class GoogleCalendarAccess extends AppCompatActivity {
 
     private void beginCalendarCalls() {
         if (mAuthStateManager.getCurrent().isAuthorized()) {
-            Log.d("Google Calendar", "SUCCESS");
+            Log.d("Google Calendar", "Begin Calendar Call");
             mAuthStateManager.getCurrent().performActionWithFreshTokens(mAuthService,
                     this::fetchCalendarInfo);
         }
@@ -205,7 +213,7 @@ public class GoogleCalendarAccess extends AppCompatActivity {
                     JSONObject event = events.getJSONObject(i);
                     JSONObject start = event.getJSONObject("start");
                     JSONObject end = event.getJSONObject("end");
-                    Log.e("Google Calendar", start.toString());
+                    Log.e("Google Calendar", start.toString() + " " + end.toString());
 
                     currentlyBusyNotif();
                 }
@@ -230,10 +238,13 @@ public class GoogleCalendarAccess extends AppCompatActivity {
         long timeAtButtonClick = System.currentTimeMillis();
 
         //change this variable to whatever delay you want
-        long delaySecondsInMillis = 500;
+        long delaySecondsInMillis = 2000;
+
+        Log.d("Google Calendar", "Notification queued");
 
         alarmManager.set(AlarmManager.RTC_WAKEUP,
                 timeAtButtonClick + delaySecondsInMillis, pendingIntent);
+        return;
     }
 
 
