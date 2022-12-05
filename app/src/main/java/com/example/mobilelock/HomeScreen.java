@@ -125,7 +125,7 @@ public class HomeScreen<adapter> extends AppCompatActivity {
                             startActivity(new Intent(HomeScreen.this, HomeScreen.class));
                             break;
                         case 1:
-                            startActivity(new Intent(HomeScreen.this, HomeScreen.class));
+                            startActivity(new Intent(HomeScreen.this, ApplicationControl.class));
                             break;
                         case 2:
                             startActivity(new Intent(HomeScreen.this, WeeklyOutlook.class));

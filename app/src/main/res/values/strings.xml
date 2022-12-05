@@ -48,7 +48,6 @@
     <string name="SCOPE_CALENDAR">https://www.googleapis.com/auth/calendar</string>
 
 
-
     <string name="DATA_PICTURE">picture</string>
     <string name="DATA_FIRST_NAME">given_name</string>
     <string name="DATA_LAST_NAME">family_name</string>
@@ -66,5 +65,6 @@
 
     <string name="URL_LOGOUT_REDIRECT">com.example.mobilelock:/logout</string>
     <string name="usage_breakdown">Usage Breakdown</string>
+    <string name="applications">Applications</string>
 
 </resources>

@@ -54,7 +54,7 @@ public class WeeklyOutlook extends AppCompatActivity {
                             startActivity(new Intent(WeeklyOutlook.this, HomeScreen.class));
                             break;
                         case 1:
-                            startActivity(new Intent(WeeklyOutlook.this, HomeScreen.class));
+                            startActivity(new Intent(WeeklyOutlook.this, ApplicationControl.class));
                             break;
                         case 2:
                             startActivity(new Intent(WeeklyOutlook.this, WeeklyOutlook.class));
