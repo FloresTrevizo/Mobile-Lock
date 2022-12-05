@@ -144,9 +144,6 @@ public class GoogleCalendarAccess extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         beginCalendarCalls();
-
-                                        //currentlyBusyNotif();
-
                                         handler.postDelayed(this, secondCount * 1000);
                                     }
                                 }, secondCount * 1000);
@@ -213,9 +210,11 @@ public class GoogleCalendarAccess extends AppCompatActivity {
                     JSONObject event = events.getJSONObject(i);
                     JSONObject start = event.getJSONObject("start");
                     JSONObject end = event.getJSONObject("end");
-                    Log.e("Google Calendar", start.toString() + " " + end.toString());
 
-                    currentlyBusyNotif();
+                    if(withinTimeWindow(start, end, now.toString())) {
+                        currentlyBusyNotif();
+                    }
+                    Log.e("Google Calendar", start.toString() + " " + end.toString());
                 }
 
             } catch (IOException ioEx) {
@@ -230,7 +229,7 @@ public class GoogleCalendarAccess extends AppCompatActivity {
     private void currentlyBusyNotif() {
 
         Intent intent = new Intent(GoogleCalendarAccess.this, ReminderBroadcast.class);
-        intent.putExtra("type", "calendar");
+        intent.putExtra("type", "Calendar");
         PendingIntent pendingIntent = PendingIntent.getBroadcast(GoogleCalendarAccess.this, 0, intent, 0);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -246,6 +245,11 @@ public class GoogleCalendarAccess extends AppCompatActivity {
                 timeAtButtonClick + delaySecondsInMillis, pendingIntent);
         return;
     }
+
+    private boolean withinTimeWindow(JSONObject start, JSONObject end, String toString) {
+        return true;
+    }
+
 
 
     @Override

@@ -46,40 +46,30 @@ public class ReminderBroadcast extends BroadcastReceiver {
 
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Notifications")
-                    .setSmallIcon(R.drawable.ic_launcher_background)
-                    .setContentTitle("Busy")
-                    .setContentText("Your calendar shows you currently busy. Take a break.")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-            notificationManager.notify(200, builder.build());
-        } else {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Notifications")
-                    .setSmallIcon(R.drawable.ic_launcher_background)
-                    .setContentTitle("Busy Day Tomorrow.")
-                    .setContentText("Limit " + mAdapter.getItem(0).getPackageName() + " and " + mAdapter.getItem(1).getPackageName() + " tommorow to buy yourself time")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-            notificationManager.notify(200, builder.build());
+            String type = extras.getString("type");
+            if(type.equals("Calendar")) {
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Notifications")
+                        .setSmallIcon(R.drawable.ic_launcher_background)
+                        .setContentTitle("Calendar")
+                        .setContentText("Your calendar shows you currently busy. Take a break.")
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                notificationManager.notify(200, builder.build());
+            } else if (type.equals("Time")) {
+                String s1 = mAdapter.getItem(0).getPackageName();
+                String top1 = s1.substring(s1.lastIndexOf('.') + 1).trim();
+                String s2 = mAdapter.getItem(1).getPackageName();
+                String top2 = s2.substring(s2.lastIndexOf('.') + 1).trim();
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Notifications")
+                        .setSmallIcon(R.drawable.ic_launcher_background)
+                        .setContentTitle("Busy Day Tomorrow.")
+                        .setContentText("Limit " + top1 + " and " + top2 + " tommorow to buy yourself time")
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                notificationManager.notify(200, builder.build());
+            }
         }
     }
-
-
-    public static class AppNameComparator implements Comparator<UsageStats> {
-        private Map<String, String> mAppLabelList;
-
-        AppNameComparator(Map<String, String> appList) {
-            mAppLabelList = appList;
-        }
-
-        @Override
-        public final int compare(UsageStats a, UsageStats b) {
-            String alabel = mAppLabelList.get(a.getPackageName());
-            String blabel = mAppLabelList.get(b.getPackageName());
-            return alabel.compareTo(blabel);
-        }
-    }
-
 
     public static class UsageTimeComparator implements Comparator<UsageStats> {
         @Override
@@ -98,12 +88,9 @@ public class ReminderBroadcast extends BroadcastReceiver {
     class UsageStatsAdapter extends BaseAdapter {
         // Constants defining order for display order
         private static final int _DISPLAY_ORDER_USAGE_TIME = 0;
-        private static final int _DISPLAY_ORDER_APP_NAME = 1;
 
         private int mDisplayOrder = _DISPLAY_ORDER_USAGE_TIME;
         private ReminderBroadcast.UsageTimeComparator mUsageTimeComparator = new ReminderBroadcast.UsageTimeComparator();
-        private ReminderBroadcast.AppNameComparator mAppLabelComparator;
-        public final ArrayMap<String, String> mAppLabelMap = new ArrayMap<>();
         public final ArrayList<UsageStats> mPackageStats = new ArrayList<>();
 
         UsageStatsAdapter() {
@@ -124,10 +111,6 @@ public class ReminderBroadcast extends BroadcastReceiver {
 
                 // load application labels for each application
                 try {
-                    ApplicationInfo appInfo = mPm.getApplicationInfo(pkgStats.getPackageName(), 0);
-                    String label = appInfo.loadLabel(mPm).toString();
-                    mAppLabelMap.put(pkgStats.getPackageName(), label);
-
                     UsageStats existingStats =
                             map.get(pkgStats.getPackageName());
                     if (existingStats == null) {
@@ -136,14 +119,13 @@ public class ReminderBroadcast extends BroadcastReceiver {
                         existingStats.add(pkgStats);
                     }
 
-                } catch (PackageManager.NameNotFoundException e) {
-                    // This package may be gone.
+                } catch(Exception e) {
+
                 }
             }
             mPackageStats.addAll(map.values());
 
             // Sort list
-            mAppLabelComparator = new ReminderBroadcast.AppNameComparator(mAppLabelMap);
             sortList();
         }
 
@@ -189,8 +171,7 @@ public class ReminderBroadcast extends BroadcastReceiver {
             // Bind the data efficiently with the holder
             UsageStats pkgStats = mPackageStats.get(position);
             if (pkgStats != null) {
-                String label = mAppLabelMap.get(pkgStats.getPackageName());
-                holder.pkgName.setText(label);
+                holder.pkgName.setText(pkgStats.getPackageName());
                 holder.usageTime.setText(
                         DateUtils.formatElapsedTime(pkgStats.getTotalTimeInForeground() / 1000));
             } else {
@@ -211,9 +192,6 @@ public class ReminderBroadcast extends BroadcastReceiver {
             if (mDisplayOrder == _DISPLAY_ORDER_USAGE_TIME) {
                 if (localLOGV) Log.i(TAG, "Sorting by usage time");
                 Collections.sort(mPackageStats, mUsageTimeComparator);
-            } else if (mDisplayOrder == _DISPLAY_ORDER_APP_NAME) {
-                if (localLOGV) Log.i(TAG, "Sorting by application name");
-                Collections.sort(mPackageStats, mAppLabelComparator);
             }
             notifyDataSetChanged();
         }
