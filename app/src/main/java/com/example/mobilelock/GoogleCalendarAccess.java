@@ -3,9 +3,9 @@ package com.example.mobilelock;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 
 //import com.google.android.gms.auth.api.identity.SaveAccountLinkingTokenRequest;
+
+import com.google.api.client.util.DateTime;
 
 import net.openid.appauth.AppAuthConfiguration;
 import net.openid.appauth.AuthorizationException;
@@ -26,17 +28,32 @@ import net.openid.appauth.TokenResponse;
 import net.openid.appauth.browser.BrowserAllowList;
 import net.openid.appauth.browser.VersionedBrowserMatcher;
 
-public class googleCalendarAccess extends AppCompatActivity {
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class GoogleCalendarAccess extends AppCompatActivity {
     private Button button;
     private static final int RC_AUTH = 100;
     private AuthorizationService mAuthService;
     private AuthorizationServiceConfiguration mAuthServiceConfig;
     private AuthStateManager mAuthStateManager;
+    private ExecutorService mExecutor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_redirect_uri_receiver);
+        mExecutor = Executors.newSingleThreadExecutor();
+
 
         button = findViewById(R.id.calendar);
         mAuthStateManager = new AuthStateManager(this);
@@ -66,6 +83,7 @@ public class googleCalendarAccess extends AppCompatActivity {
             }
         });
 
+
     }
 
 
@@ -80,7 +98,6 @@ public class googleCalendarAccess extends AppCompatActivity {
         builder.setScopes(getString(R.string.SCOPE_PROFILE),
                 getString(R.string.SCOPE_EMAIL),
                 getString(R.string.SCOPE_OPENID),
-                getString(R.string.SCOPE_DRIVE),
                 getString(R.string.SCOPE_CALENDAR));
 
         AuthorizationRequest authRequest = builder.build();
@@ -110,8 +127,13 @@ public class googleCalendarAccess extends AppCompatActivity {
                         @Override
                         public void onTokenRequestCompleted(@Nullable TokenResponse response, @Nullable AuthorizationException ex) {
                             if(response != null) {
+                                Log.d("Google Calendar", "" + mAuthStateManager.getCurrent().isAuthorized());
                                 mAuthStateManager.updateAfterTokenResponse(response, ex);
+                                Log.d("Google Calendar", "" + mAuthStateManager.getCurrent().isAuthorized());
+
                                 //token exchange succeeded
+
+                                beginCalendarCalls();
                             }
                         }
                     });
@@ -120,11 +142,22 @@ public class googleCalendarAccess extends AppCompatActivity {
         else if (resultCode == RESULT_CANCELED) {
 
         }
-        if(mAuthStateManager.getCurrent().isAuthorized()) {
+
+        beginCalendarCalls();
+
+
+
+        startActivity(new Intent(GoogleCalendarAccess.this, HomeScreen.class));
+
+    }
+
+    private void beginCalendarCalls() {
+        if (mAuthStateManager.getCurrent().isAuthorized()) {
             Log.d("Google Calendar", "SUCCESS");
             mAuthStateManager.getCurrent().performActionWithFreshTokens(mAuthService,
                     this::fetchCalendarInfo);
         }
+
     }
 
     private void fetchCalendarInfo(String accessToken,
@@ -134,13 +167,81 @@ public class googleCalendarAccess extends AppCompatActivity {
                         .getAuthorizationServiceConfiguration()
                         .discoveryDoc;
 
-        /*Configuration mConfiguration = Configuration.getInstance(this);
 
-        Uri userInfoEndpoint =
-                mConfiguration.getUserInfoEndpointUri() != null
-                        ? Uri.parse(mConfiguration.getUserInfoEndpointUri().toString())
-                        : Uri.parse(discovery.getUserinfoEndpoint().toString());*/
+        Uri userInfoEndpoint = Uri.parse(getString(R.string.SCOPE_CALENDAR));
+
+        mExecutor.submit(() -> {
+            try {
+                DateTime now = new DateTime(System.currentTimeMillis());
+                String time = now.toString().substring(0, now.toString().length()-6) + "Z";
+                URL url = new URL("https://www.googleapis.com/calendar/v3/calendars/primary/events");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                Log.d("Google Calendar", "Time: " + time);
+
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("calendarId", "primary");
+                conn.setRequestProperty("singleEvents", String.valueOf(true));
+                conn.setRequestProperty("orderBy", "startTime");
+                conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+                conn.setInstanceFollowRedirects(true);
+
+                String eventInfo = "";
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        conn.getInputStream()));
+                String tmp = "";
+                while((tmp = in.readLine()) != null) {
+                    eventInfo += tmp;
+                }
+                in.close();
+
+                Log.d("Google Calendar", "Event info: " + eventInfo);
+
+                JSONObject json = new JSONObject(eventInfo);
+                JSONArray events = json.getJSONArray("items");
+
+                for(int i = events.length() - 1; i > events.length() - 5 ; i--) {
+                    JSONObject event = events.getJSONObject(i);
+                    JSONObject start = event.getJSONObject("start");
+                    JSONObject end = event.getJSONObject("end");
+                    Log.e("Google Calendar", start.toString());
+
+                    currentlyBusyNotif();
+                }
+
+            } catch (IOException ioEx) {
+                Log.e("Google Calendar", "Network error when querying userinfo endpoint", ioEx);
+            } catch (JSONException jsonEx) {
+                Log.e("Google Calendar", "Failed to parse userinfo response");
+            }
+        });
 
     }
+
+    private void currentlyBusyNotif() {
+
+        Intent intent = new Intent(GoogleCalendarAccess.this, ReminderBroadcast.class);
+        intent.putExtra("type", "calendar");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(GoogleCalendarAccess.this, 0, intent, 0);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        long timeAtButtonClick = System.currentTimeMillis();
+
+        //change this variable to whatever delay you want
+        long delaySecondsInMillis = 500;
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP,
+                timeAtButtonClick + delaySecondsInMillis, pendingIntent);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mAuthService.dispose();
+        mExecutor.shutdownNow();
+    }
+
 
 }

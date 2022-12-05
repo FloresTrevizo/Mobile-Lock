@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.ArrayMap;
 import android.util.Log;
@@ -43,13 +44,24 @@ public class ReminderBroadcast extends BroadcastReceiver {
         mPm = context.getPackageManager();
         mAdapter = new UsageStatsAdapter();
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Notifications")
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentTitle("Busy Day Tomorrow.")
-                .setContentText("Limit " + mAdapter.getItem(0).getPackageName() + " and " + mAdapter.getItem(1).getPackageName() + " tommorow to buy yourself time")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        notificationManager.notify(200, builder.build());
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Notifications")
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+                    .setContentTitle("Busy")
+                    .setContentText("Your calendar shows you currently busy. Take a break.")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+            notificationManager.notify(200, builder.build());
+        } else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Notifications")
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+                    .setContentTitle("Busy Day Tomorrow.")
+                    .setContentText("Limit " + mAdapter.getItem(0).getPackageName() + " and " + mAdapter.getItem(1).getPackageName() + " tommorow to buy yourself time")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+            notificationManager.notify(200, builder.build());
+        }
     }
 
 

@@ -96,7 +96,7 @@ public class HomeScreen<adapter> extends AppCompatActivity {
                 long timeAtButtonClick = System.currentTimeMillis();
 
                 //change this variable to whatever delay you want
-                long delaySecondsInMillis = 500 * 10;
+                long delaySecondsInMillis = 500 * 2;
 
                 alarmManager.set(AlarmManager.RTC_WAKEUP,
                         timeAtButtonClick + delaySecondsInMillis, pendingIntent);
